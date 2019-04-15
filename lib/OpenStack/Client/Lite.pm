@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use OpenStack::Client::Lite::Routes   ();
+use Scalar::Util qw/weaken/;
 
 use Moo;
 use Test::More;
@@ -11,17 +12,22 @@ use Test::More;
 has 'debug'           => ( is => 'rw', default => 0 );
 has 'auth' => (
 	is      => 'ro',
-	lazy    => 1,
-	default => sub {
-		die "Auth missing...";
-	},
-	handles => [qw/version/],
+	required => 1,
+#	handles => [qw/version/],
 );
 
 has 'route' => (
 	is => 'ro',
 #	lazy    => 1,
-	default => sub { OpenStack::Client::Lite::Routes->new() }, 
+	default => sub { 
+		my ( $self ) = @_;
+
+		# weaken our circular dependency
+		my $auth = $self->auth;
+		weaken( $auth );
+
+		return OpenStack::Client::Lite::Routes->new( auth => $auth );
+	}, 
 	handles => [ OpenStack::Client::Lite::Routes::list_all() ],
 );
 
