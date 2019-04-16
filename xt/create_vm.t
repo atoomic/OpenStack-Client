@@ -19,7 +19,8 @@ my $IMAGE_UID = '170fafa5-1329-44a3-9c27-9bb77b77206d';
 my $IMAGE_NAME = 'myimage';
 
 # name of the VM we are creating as part of this testsuite
-my $SERVER_NAME = 'testsuite';
+#my $SERVER_NAME = 'testsuite autobuild c7 11.81.9999.42';
+my $SERVER_NAME = 'testsuite OpenStack::Client::Lite';
 
 SKIP: {
     skip "OS_AUTH_URL unset, please source one openrc.sh file before." unless $ENV{OS_AUTH_URL};
@@ -189,6 +190,7 @@ SKIP: {
 
             #--network fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4 
             #wait => 1,
+            network_for_floating_ip => 'vlan3340-product',
             
         );
     }

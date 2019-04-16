@@ -44,6 +44,7 @@ sub create_vm {
     die "'network' name or id is required by create_vm" unless defined $opts{network};
     die "'image' name or id is required by create_vm" unless defined $opts{image};
     die "'name' field is required by create_vm" unless defined $opts{name};
+    die "'network_for_floating_ip' field is required by create_vm" unless defined $opts{network_for_floating_ip};
 
     $opts{security_group} //= 'default'; # optional argument fallback to 'default'
 
@@ -52,6 +53,9 @@ sub create_vm {
 
     # get the network by id or name
     my $network = $self->look_by_id_or_name( networks => $opts{network} );
+    # get the network used to add the floating up later
+    my $network_for_floating_ip = $self->look_by_id_or_name( networks => $opts{network_for_floating_ip} );
+
 
     my $image;
     if ( _looks_valid_id( $opts{image} ) ) {
@@ -60,12 +64,6 @@ sub create_vm {
     $image //= $self->image_from_name( $opts{image} );
 
     my $security_group = $self->look_by_id_or_name( security_groups => $opts{security_group} );
-
-    note "---"x10;
-    # note flavor => explain $flavor;
-    # note network => explain $network;
-    # note security_group => explain $security_group;
-    note ".... got flavor, and a network, image, group...";
 
     my @extra;
     if ( defined $opts{key_name} ) {
@@ -110,7 +108,15 @@ sub create_vm {
 
     # now add one IP to the server
     if ( $server_is_ready ) {
-        
+        # create a floating IP
+
+        # add the floating IP to the server
+        my $floating_ip = $self->create_floating_ip( $network_for_floating_ip->{id} );
+        note explain $floating_ip;
+        die "Failed to create floating ip" unless ref $floating_ip && _looks_valid_id( $floating_ip->{id} );
+
+        $self->add_floating_ip_to_server( $floating_ip->{id}, $server_uid );
+
     }
     note "need to add one IP to the server...";
 
@@ -146,13 +152,9 @@ sub _looks_valid_id {
     return $id =~ $VALID_ID;
 }
 
-sub add_floating_ip_to_server {
+# sub destroy_vm {
 
-}
-
-sub destroy_vm {
-
-}
+# }
 
 
 1;

@@ -94,7 +94,11 @@ create_server:
   service: compute
 networks:
   service: network
+add_floating_ip_to_server:
+  service: network
 security_groups:
+  service: network
+create_floating_ip:
   service: network
 image_from_uid:
   service: images
