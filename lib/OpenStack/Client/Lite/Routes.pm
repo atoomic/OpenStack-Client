@@ -86,6 +86,10 @@ flavors:
   service: compute
 servers:
   service: compute
+server_from_uid:
+  service: compute
+create_server:
+  service: compute
 networks:
   service: network
 security_groups:

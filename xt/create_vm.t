@@ -18,6 +18,8 @@ my $VALID_ID = match qr{^[a-f0-9\-]+$};
 my $IMAGE_UID = '170fafa5-1329-44a3-9c27-9bb77b77206d';
 my $IMAGE_NAME = 'myimage';
 
+# name of the VM we are creating as part of this testsuite
+my $SERVER_NAME = 'testsuite';
 
 SKIP: {
     skip "OS_AUTH_URL unset, please source one openrc.sh file before." unless $ENV{OS_AUTH_URL};
@@ -173,66 +175,25 @@ SKIP: {
     {
         note "create a VM...";
 
-        my $vm = $api->create_vm( 
-            image => $IMAGE_UID,
+        my $vm = $api->create_vm(         
+            name => $SERVER_NAME, # vm name            
+            image => $IMAGE_UID, # image used to create the VM
             flavor   => 'small',
-            key_name => 'openStack nico', 
-            # default
-            #security_group => 'default',
-            network  => 'Dev Infra initial gre network',
+            key_name => 'openStack nico', # optional key to set
+            #security_group => 'default', # security group to use, by default use 'default'
+            network  => 'Dev Infra initial gre network', # network group to use
             # or network  => qr{Dev Infra}',
             # or network  => 'fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4 ',
 
             #--network fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4 
             wait => 1,
-            name => 'testsuite xt/create_vm.t',
+            
         );
     }
 
-
     #note explain $api;
-#   {
-#     'admin_state_up' => $VAR1->[0]{'admin_state_up'},
-#     'availability_zone_hints' => [],
-#     'availability_zones' => [
-#       'nova'
-#     ],
-#     'created_at' => '2019-04-09T21:40:09Z',
-#     'description' => '',
-#     'id' => 'fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4',
-#     'ipv4_address_scope' => undef,
-#     'ipv6_address_scope' => undef,
-#     'mtu' => 1458,
-#     'name' => 'Dev Infra initial gre network',
-#     'project_id' => '76fb18aec577491bb676b482f5671352',
-#     'revision_number' => 4,
-#     'router:external' => $VAR1->[0]{'is_default'},
-#     'shared' => $VAR1->[0]{'is_default'},
-#     'status' => 'ACTIVE',
-#     'subnets' => [
-#       'a3267fc9-0f73-45e1-9296-cb39805aa2f5',
-#       '5b1e5c0e-62cc-4d64-ae79-43ce763506c4'
-#     ],
-#     'tags' => [],
-#     'tenant_id' => '76fb18aec577491bb676b482f5671352',
-#     'updated_at' => '2019-04-09T21:45:51Z'
-#   }
 
 }
-
-# https://developer.openstack.org/api-ref/image/v2/?expanded=list-images-detail
-
-# by id.. 
-# /v2/images/{image_id}
-# GET v2/images?name=in:"glass,%20darkly",share%20me
-
-# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=None" -H "User-Agent: openstacksdk/0.27.0
-# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=d9a7cffe-0e0b-435e-8a6d-8b943872aa3d" -H "
-# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=6bf8279d-3d69-4765-bc81-ce514285bd7a" -H "
-# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=045b4090-2059-404b-bfc2-afc67d1700fa" -H "
-# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=601d3fc0-8539-4604-b88e-4f8e13d08266" -H "
-# "next": "/v2/images?marker=b67da535-2e9e-4155-a04b-9608e834ef14"
-# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=b67da535-2e9e-4155-a04b-9608e834ef14" -H "
 done_testing;
 
 __END__

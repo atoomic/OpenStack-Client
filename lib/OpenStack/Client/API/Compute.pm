@@ -38,10 +38,29 @@ sub servers {
 	return $self->_list( ['/servers', 'servers'], \@args );
 }
 
+sub server_from_uid { # by uid
+	my ( $self, $uid ) = @_;
+
+	die unless defined $uid;
+	my $uri = $self->root_uri( '/servers/' . $uid );
+	
+	my $answer = $self->get( $uri );
+	
+	return $answer->{server} if ( ref $answer && $answer->{server} );
+	return $answer;
+}
+
 sub flavors {
 	my ( $self, @args ) = @_;
 
 	return $self->_list( ['/flavors', 'flavors'], \@args );
+}
+
+sub create_server {
+	my ( $self, %opts ) = @_;
+
+	my $uri = $self->root_uri( '/servers/' );	
+	return $self->post( $uri, { server => { %opts } } );	
 }
 
 ### helpers

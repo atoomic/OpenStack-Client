@@ -225,7 +225,9 @@ sub request {
         if (ref($args{'body'}) =~ /CODE/) {
             $request->content($args{'body'});
         } else {
-            $request->content(JSON::encode_json($args{'body'}));
+            my $body_as_json = JSON::encode_json($args{'body'});
+            debug( "BODY:", $body_as_json );
+            $request->content( $body_as_json );
         }
     }
 
