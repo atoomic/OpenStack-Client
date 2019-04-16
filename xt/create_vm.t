@@ -125,9 +125,7 @@ SKIP: {
 
             like $network_by_name_regex, $network_by_name, "can get a network using a regex for the name";
 
-        }
-        
-
+        }    
     }
 
     
@@ -139,6 +137,9 @@ SKIP: {
             key_name => 'openStack nico', 
             security_group => 'default',
             network  => 'Dev Infra initial gre network',
+            # or network  => qr{Dev Infra}',
+            # or network  => 'fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4 ',
+
             #--network fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4 
             wait => 1,
             name => 'testsuite xt/create_vm.t',
