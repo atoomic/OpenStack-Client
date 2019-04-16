@@ -90,5 +90,9 @@ networks:
   service: network
 security_groups:
   service: network
+image_from_uid:
+  service: images
+image_from_name:
+  service: images
 
 

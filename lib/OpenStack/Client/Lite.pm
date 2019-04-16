@@ -40,7 +40,8 @@ around BUILDARGS => sub {
 sub create_vm {
     my ( $self, %opts ) = @_;
 
-    die "flavor name is required to create_vm" unless defined $opts{flavor};
+    die "'flavor' name or id is required by create_vm" unless defined $opts{flavor};
+    die "'network' name or id is required by create_vm" unless defined $opts{network};
 
     # get the flavor by id or name...
     my $flavor;

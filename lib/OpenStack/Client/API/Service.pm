@@ -21,7 +21,7 @@ has 'client' => ( is => 'ro', lazy => 1, default => sub {
 		interface => $self->interface 
 	 );
 },
-	handles => [ qw/endpoint/ ]
+	handles => [ qw/endpoint get put post delete/ ]
 
 );
 

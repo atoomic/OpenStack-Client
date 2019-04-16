@@ -32,8 +32,10 @@ sub keypairs {
 #note "DATA: ", explain $self->DataAsYaml;
 }
 
-sub compute {
+sub servers {
+	my ( $self, @args ) = @_;
 
+	return $self->_list( ['/servers', 'servers'], \@args );
 }
 
 sub flavors {

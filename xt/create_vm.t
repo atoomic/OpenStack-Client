@@ -10,6 +10,7 @@ use Test2::Plugin::NoWarnings;
 
 use OpenStack::Client ();
 
+note "enabling debug for OpenStack::Client";
 OpenStack::Client::enable_debug();
 
 my $VALID_ID = match qr{^[a-f0-9\-]+$};
@@ -32,6 +33,22 @@ SKIP: {
         }
 
     );
+
+    {
+        note "Testing images";
+        my $IMAGE_UID = '170fafa5-1329-44a3-9c27-9bb77b77206d';
+        my $IMAGE_NAME = 'myimage';
+
+        my $image = $api->image_from_uid( $IMAGE_UID ); 
+        is $image, hash {
+            field id => $IMAGE_UID;
+            field name => $IMAGE_NAME;        
+            etc;
+        }, "image_from_uid $IMAGE_UID returns one image";
+        
+        my $image_from_name = $api->image_from_name( $IMAGE_NAME );
+        like $image_from_name, $image, "image_from_name $IMAGE_NAME";
+    }
 
     is( $api, 
         object {
@@ -64,7 +81,7 @@ SKIP: {
 
  #   note explain $api->flavors();
     {   
-        note "get a single flavor";
+        note "======= get a single flavor";
         my $small = $api->flavors( name => 'small' );
         note explain $small;
         is $small => hash {
@@ -76,7 +93,7 @@ SKIP: {
     } 
 
     {
-        note "get all flavors";
+        note "======= get all flavors";
         my @flavors = $api->flavors();
         ok scalar @flavors > 1, "got more than one flavor";
         foreach my $flavor ( @flavors ) {
@@ -91,7 +108,7 @@ SKIP: {
 
 
     {
-        note "testing networks";
+        note "======= testing networks";
 
         my @networks = $api->networks();
         ok scalar @networks, "got some networks";
@@ -177,14 +194,27 @@ SKIP: {
 
 }
 
+# https://developer.openstack.org/api-ref/image/v2/?expanded=list-images-detail
 
+# by id.. 
+# /v2/images/{image_id}
+# GET v2/images?name=in:"glass,%20darkly",share%20me
+
+# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=None" -H "User-Agent: openstacksdk/0.27.0
+# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=d9a7cffe-0e0b-435e-8a6d-8b943872aa3d" -H "
+# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=6bf8279d-3d69-4765-bc81-ce514285bd7a" -H "
+# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=045b4090-2059-404b-bfc2-afc67d1700fa" -H "
+# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=601d3fc0-8539-4604-b88e-4f8e13d08266" -H "
+# "next": "/v2/images?marker=b67da535-2e9e-4155-a04b-9608e834ef14"
+# REQ: curl -g -i -X GET "http://service01a-c2.cpanel.net:9292/v2/images?marker=b67da535-2e9e-4155-a04b-9608e834ef14" -H "
 done_testing;
 
 __END__
 
 http://service01a-c2.cpanel.net:8774/v2.1/os-keypairs
-
-> openstack server create --image 170fafa5-1329-44a3-9c27-9bb77b77206d 
+    
+> openstack server create 
+    --image 170fafa5-1329-44a3-9c27-9bb77b77206d 
     --flavor small 
     --key-name 'openStack nico' 
     --security-group default 
@@ -202,7 +232,17 @@ REQ: curl -g -i -X POST http://service01a-c2.cpanel.net:8774/v2.1/servers -H "Ac
     -H "Content-Type: application/json" -H "User-Agent: python-novaclient" 
     -H "X-Auth-Token: {SHA256}2a39527dd72e1c2bf48cf33883e87c18a81d12e46d1d55e5ece4f8f1437fb3a8" 
     -H "X-OpenStack-Nova-API-Version: 2.1" 
-    -d '{"server": {"name": "testFromAPI2", "imageRef": "170fafa5-1329-44a3-9c27-9bb77b77206d", "flavorRef": "1ffe5704-06e5-4c2d-828c-496a06f477a4", "key_name": "openStack nico", "min_count": 1, "max_count": 1, "security_groups": [{"name": "6f86e4c2-a498-4f4d-afe9-a2def5ada8c8"}], "networks": [{"uuid": "fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4"}]}}'
+    -d '{"server": {
+                        "name": "testFromAPI2", 
+                        "imageRef": "170fafa5-1329-44a3-9c27-9bb77b77206d", 
+                        "flavorRef": "1ffe5704-06e5-4c2d-828c-496a06f477a4", 
+                        "key_name": "openStack nico", 
+                        "min_count": 1, 
+                        "max_count": 1, 
+                        "security_groups": [{"name": "6f86e4c2-a498-4f4d-afe9-a2def5ada8c8"}], 
+                        "networks": [{"uuid": "fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4"}]
+                    }
+        }'
 
 REQ: curl -g -i -X GET http://service01a-c2.cpanel.net:8774/v2.1/servers/6ac4b745-1501-46a8-9533-56e0a88ee3a1 -H "Accept
 ... [ multiple times ?? /// wait ]
