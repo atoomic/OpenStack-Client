@@ -7,7 +7,7 @@ use Test::More;
 use Moo;
 
 # FIXME import LoadData / DataAsYaml
-use OpenStack::Client::Lite::Helpers::DataAsYaml;
+#use OpenStack::Client::Lite::Helpers::DataAsYaml;
 
 # use Client::API role
 #with 'OpenStack::Client::API'; ...
@@ -29,7 +29,7 @@ sub keypairs {
 	my ( $self, @args ) = @_;
 
 	return $self->_list( ['/os-keypairs', 'keypairs'], \@args );
-#note "DATA: ", explain $self->DataAsYaml;
+	#note "DATA: ", explain $self->DataAsYaml;
 }
 
 sub servers {
@@ -45,9 +45,25 @@ sub server_from_uid { # by uid
 	my $uri = $self->root_uri( '/servers/' . $uid );
 	
 	my $answer = $self->get( $uri );
-	
+
 	return $answer->{server} if ( ref $answer && $answer->{server} );
 	return $answer;
+}
+
+sub delete_server {
+	my ( $self, $uid ) = @_;
+
+	# first check that the server exists
+	my $server = $self->server_from_uid( $uid );
+	return unless ref $server && $server->{id} eq $uid;
+
+	# FIXME destroy the floating IP...
+
+	# DELETE http://service01a-c2.cpanel.net:8774/v2.1/servers/9fcfa8d2-94b0-4749-be7b-e688139fb6d2 -H "Acc
+
+	# maybe need to wait?
+	my $uri = $self->root_uri( '/servers/' . $uid );
+	return $self->delete( $uri );
 }
 
 sub flavors {

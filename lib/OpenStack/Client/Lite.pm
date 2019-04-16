@@ -93,18 +93,25 @@ sub create_vm {
 
     my $now      = time();
     my $max_time = $now + $wait_time_limit;
+    my $server_is_ready;
+
     # TODO: maybe add one alarm...
     while ( time() < $max_time ) {
 
         my $server = $self->server_from_uid( $server_uid );
-        if ( ref $server  ) {
-            last if $server->{status} && $server->{status} && lc($server->{status}) eq 'active';
+        if ( ref $server  
+            && $server->{status} && $server->{status} && lc($server->{status}) eq 'active' ) 
+        {
+            $server_is_ready = 1;
+            last;
         }
         sleep 5;
     }
 
     # now add one IP to the server
-
+    if ( $server_is_ready ) {
+        
+    }
     note "need to add one IP to the server...";
 
 

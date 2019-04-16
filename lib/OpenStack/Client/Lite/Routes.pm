@@ -86,6 +86,8 @@ flavors:
   service: compute
 servers:
   service: compute
+delete_server:
+  service: compute
 server_from_uid:
   service: compute
 create_server:

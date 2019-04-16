@@ -171,6 +171,8 @@ SKIP: {
         }    
     }
 
+    note "delete_test_servers before creating a new one";
+    delete_test_servers( $api );
     
     {
         note "create a VM...";
@@ -186,15 +188,31 @@ SKIP: {
             # or network  => 'fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4 ',
 
             #--network fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4 
-            wait => 1,
+            #wait => 1,
             
         );
     }
 
+    note "delete_test_servers after test";
+    #delete_test_servers( $api );
     #note explain $api;
 
 }
 done_testing;
+
+sub delete_test_servers {
+    my ( $api ) = @_;
+
+    my @servers = $api->servers( name => $SERVER_NAME );
+    foreach my $server ( @servers ) {
+        next unless defined $server->{id} && length $server->{id};
+        note "delete server - ", "id: ", $server->{id}, " ; name: ", $server->{name};
+        note explain $api->delete_server( $server->{id} );
+    }
+
+    return;
+}
+
 
 __END__
 
