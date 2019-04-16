@@ -9,36 +9,23 @@ use Moo;
 use OpenStack::Client::API ();
 use YAML::XS;
 
+use OpenStack::Client::Lite::Helpers::DataAsYaml;
+
 has 'auth' => (
 	is      => 'ro',
 	#required => 1,
 );
 
 our $ROUTES;
-BEGIN { $ROUTES = {} }
-
-# FIXME -> move to a role Role::Read::DATA::YAML
-# provide one accessor data
 
 sub init_once {
-	my $data;
-	{
-		local $/;
-		$data = <DATA>;
-	}
-	$ROUTES = Load( $data );
-
-	{
-		no warnings 'redefine';
-		*init_once = sub {};
-	}
-	return 1;
+	$ROUTES //= OpenStack::Client::Lite::Helpers::DataAsYaml::LoadData();
 }
 
 # cannot read from data block at compile time
 INIT { init_once() }
 
-sub list_all {
+sub list_all {	
 	init_once();
 	return sort keys %$ROUTES;
 }
@@ -52,8 +39,6 @@ sub AUTOLOAD {
 	my $call_for = $AUTOLOAD;
 
 	$call_for =~ s/.*:://;
-
-	#init_once();
 
 	if ( my $route = $ROUTES->{$call_for} ) {
 		note "calling from AUTOLOAD.... ", $call_for;

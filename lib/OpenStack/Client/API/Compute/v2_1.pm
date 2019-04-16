@@ -15,3 +15,6 @@ __
 keypairs:
   uri: /os-keypairs
   key: keypairs
+flavors:
+  uri: /flavors
+  key: flavors
