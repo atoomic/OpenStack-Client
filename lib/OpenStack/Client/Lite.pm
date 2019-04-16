@@ -11,7 +11,7 @@ use Moo;
 use Test::More;
 
 has 'debug' => ( is => 'rw', default  => 0 );
-has 'auth'  => ( is => 'ro', required => 1 );
+has 'auth'  => ( is => 'ro', required => 1, handles => [ qw/services/ ] );
 
 has 'route' => (
     is => 'ro',

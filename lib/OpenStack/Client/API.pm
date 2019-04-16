@@ -3,7 +3,7 @@ package OpenStack::Client::API;
 use strict;
 use warnings;
 
-#use Test::More;
+use Test::More;
 #use Moo::Role;
 #use Moo;
 
@@ -16,7 +16,7 @@ sub get_service {
 	my $pkg = ucfirst $name;
 	$pkg = __PACKAGE__ . "::$pkg";
 	
-	eval qq{ require $pkg; 1 } or die "Failed to load $pkg";	
+	eval qq{ require $pkg; 1 } or die "Failed to load $pkg: $@";	
 
 	delete $opts{name};
 

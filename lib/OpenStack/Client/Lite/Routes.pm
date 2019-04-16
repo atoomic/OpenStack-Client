@@ -65,6 +65,7 @@ sub service {
 	# cache the service once
 	my $k = '_service_' . $name;
 	if ( ! $self->{$k} ) {
+		note "*** get_service.... ", $name;
 		$self->{$k} = OpenStack::Client::API::get_service( 
 			name => $name, auth => $self->auth, region => $ENV{'OS_REGION_NAME'}
 		);
@@ -80,10 +81,14 @@ sub service {
 __DATA__
 ---
 keypairs:
-  listable: 1
   service: compute
 flavors:
-  listable: 1
   service: compute
+servers:
+  service: compute
+networks:
+  service: network
+security_groups:
+  service: network
 
 

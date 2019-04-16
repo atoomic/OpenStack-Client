@@ -20,6 +20,7 @@ use URI::Encode ();
 use OpenStack::Client::Response ();
 
 our $VERSION = '1.0005';
+our $DEBUG   = 0;
 
 =encoding utf8
 
@@ -126,6 +127,22 @@ sub new ($%) {
     }, $class;
 }
 
+sub debug {
+    # void by default
+    return;
+}
+
+sub enable_debug {
+    $DEBUG = 1;
+    no warnings 'redefine';
+    *debug = sub { 
+        my ( @msg ) = @_;
+        my $txt = join( ' ', map { defined $_ ? $_ : 'undef' } '#', @msg );
+        print STDERR "$txt\n";
+        return;
+    };
+}
+
 =back
 
 =head1 INSTANCE METHODS
@@ -180,8 +197,11 @@ sub request {
 
     $args{'headers'} ||= {};
 
+    my $uri = $self->uri($args{'path'});
+    debug( $args{'method'}, $uri );
+
     my $request = $self->{'package_request'}->new(
-        $args{'method'} => $self->uri($args{'path'})
+        $args{'method'} => $uri
     );
 
     my @headers = $self->_get_headers_list($args{'headers'});
@@ -446,6 +466,8 @@ sub get ($$%) {
         }
     }
 
+    #debug( 'GET:', $path );
+
     return $self->call('GET' => $path);
 }
 
@@ -583,6 +605,8 @@ JSON encoding of the contents of I<$body>.
 
 sub post ($$$) {
     my ($self, $path, $body) = @_;
+
+    #debug( 'POST:', $path, '...' );
 
     return $self->call('POST' => $path, $body);
 }
