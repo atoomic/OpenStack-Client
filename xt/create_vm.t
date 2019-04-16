@@ -15,6 +15,10 @@ OpenStack::Client::enable_debug();
 
 my $VALID_ID = match qr{^[a-f0-9\-]+$};
 
+my $IMAGE_UID = '170fafa5-1329-44a3-9c27-9bb77b77206d';
+my $IMAGE_NAME = 'myimage';
+
+
 SKIP: {
     skip "OS_AUTH_URL unset, please source one openrc.sh file before." unless $ENV{OS_AUTH_URL};
 
@@ -35,16 +39,36 @@ SKIP: {
     );
 
     {
+        note "Security groups";
+
+        my @groups = $api->security_groups();
+        ok scalar @groups, "security_groups returns some values";
+
+        my $valid_group = hash {
+            field created_at => D();
+            field updated_at => D();
+            field id => $VALID_ID;
+            field name=> D();            
+            etc;
+        };
+
+        foreach my $g ( @groups ) {
+            is $g, $valid_group, "security_groups return a valid group entry";
+        }
+
+        my $group = $api->security_groups( name => 'default' );
+        is $group, $valid_group, "security_groups by name";
+    }
+
+    {
         note "Testing images";
-        my $IMAGE_UID = '170fafa5-1329-44a3-9c27-9bb77b77206d';
-        my $IMAGE_NAME = 'myimage';
 
         my $image = $api->image_from_uid( $IMAGE_UID ); 
         is $image, hash {
             field id => $IMAGE_UID;
             field name => $IMAGE_NAME;        
             etc;
-        }, "image_from_uid $IMAGE_UID returns one image";
+        }, "image_from_uid $IMAGE_UID returns one image" or die "Cannot find image from UID $IMAGE_UID";
         
         my $image_from_name = $api->image_from_name( $IMAGE_NAME );
         like $image_from_name, $image, "image_from_name $IMAGE_NAME";
@@ -150,9 +174,11 @@ SKIP: {
         note "create a VM...";
 
         my $vm = $api->create_vm( 
+            image => $IMAGE_UID,
             flavor   => 'small',
             key_name => 'openStack nico', 
-            security_group => 'default',
+            # default
+            #security_group => 'default',
             network  => 'Dev Infra initial gre network',
             # or network  => qr{Dev Infra}',
             # or network  => 'fb5c81fd-0a05-46bc-8a7e-cb94dc851bb4 ',

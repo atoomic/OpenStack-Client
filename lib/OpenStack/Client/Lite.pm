@@ -42,6 +42,9 @@ sub create_vm {
 
     die "'flavor' name or id is required by create_vm" unless defined $opts{flavor};
     die "'network' name or id is required by create_vm" unless defined $opts{network};
+    die "'image' name or id is required by create_vm" unless defined $opts{image};
+
+    $opts{security_group} //= 'default'; # optional argument fallback to 'default'
 
     # get the flavor by id or name...
     my $flavor;
@@ -61,7 +64,21 @@ sub create_vm {
     $network //= $self->networks( name => $opts{network} );
     die "Cannot find network for id/name '$opts{network}'" unless ref $network eq 'HASH' && _looks_valid_id( $network->{id} );
 
-note ".... got flavor, and a network";
+    my $image;
+    if ( _looks_valid_id( $opts{image} ) ) {
+        $image = $self->image_from_uid( $opts{image} );
+    }
+    $image //= $self->image_from_name( $opts{image} );
+
+    my $security_group;
+    if ( _looks_valid_id( $opts{security_group} ) ) {
+        $security_group = $self->security_groups( id => $opts{security_group} );
+    }
+    $security_group //= $self->security_groups( name => $opts{security_group} );
+    die "Cannot find security_group for id/name '$opts{security_group}'" unless ref $security_group eq 'HASH' && _looks_valid_id( $security_group->{id} );
+
+
+note ".... got flavor, and a network, image, group...";
 
     return;
 }
