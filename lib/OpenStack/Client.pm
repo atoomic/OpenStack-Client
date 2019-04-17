@@ -127,22 +127,6 @@ sub new ($%) {
     }, $class;
 }
 
-sub debug {
-    # void by default
-    return;
-}
-
-sub enable_debug {
-    $DEBUG = 1;
-    no warnings 'redefine';
-    *debug = sub { 
-        my ( @msg ) = @_;
-        my $txt = join( ' ', map { defined $_ ? $_ : 'undef' } '#', @msg );
-        print STDERR "$txt\n";
-        return;
-    };
-}
-
 =back
 
 =head1 INSTANCE METHODS
@@ -468,8 +452,6 @@ sub get ($$%) {
         }
     }
 
-    #debug( 'GET:', $path );
-
     return $self->call('GET' => $path);
 }
 
@@ -539,8 +521,7 @@ sub every ($$$@) {
         my $result = $self->get($path, %{$opts});
 
         unless (defined $result->{$attribute}) {
-            my $keys = join( ', ', sort keys %$result );
-            die "Response from $path does not contain attribute '$attribute', possible options are " . $keys;
+            die "Response from $path does not contain attribute '$attribute'";
         }
 
         foreach my $item (@{$result->{$attribute}}) {
@@ -608,8 +589,6 @@ JSON encoding of the contents of I<$body>.
 sub post ($$$) {
     my ($self, $path, $body) = @_;
 
-    #debug( 'POST:', $path, '...' );
-
     return $self->call('POST' => $path, $body);
 }
 
@@ -630,6 +609,49 @@ sub delete ($$) {
 
     return $self->call('DELETE' => $path);
 }
+
+=back
+
+=head1 DEBUGGING
+
+=over
+
+=item C<$Openstack::Client::DEBUG>
+
+You can enable some debug informations to track performed requests by setting
+C<$Openstack::Client::DEBUG> to a true value
+
+Example:
+
+    {
+        local $Openstack::Client::DEBUG = 1;
+
+        my $auth = OpenStack::Client::Auth->new( ... );
+        my $api = $auth->service( ... );
+
+        $api->get('/v2.0/floatingips');
+    }
+
+    Will print some debug lines to STDERR
+
+    # POST http://service.***.tld:****/v3/auth/tokens
+    # BODY {"auth":{"scope":...}}
+    # GET http://service.***.tld:****/v2.0/floatingips
+
+=cut
+
+sub debug {
+    # void by default
+    my ( @msg ) = @_;
+
+    return unless $DEBUG;
+
+    my $txt = join( ' ', map { defined $_ ? $_ : 'undef' } '#', @msg );
+    print STDERR "$txt\n";
+
+    return;
+}
+
 
 =back
 
