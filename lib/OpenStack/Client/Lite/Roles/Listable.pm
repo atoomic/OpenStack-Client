@@ -9,7 +9,7 @@ use Moo::Role;
 sub _list {
 	my ( $self, $all_args, $caller_args ) = @_;
 
-	# all_args are arguments from the internal OpenStack::Client::API
+	# all_args are arguments from the internal OpenStack::Client::Lite::API
 	# caller_args are coming from the user to filter the results
 	#	if some filters are also arguments to the request
 	#	then appending them to the query will shorten the output and run it faster

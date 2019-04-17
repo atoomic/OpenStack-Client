@@ -1,4 +1,4 @@
-package OpenStack::Client::API::Images;
+package OpenStack::Client::Lite::API::Images;
 
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use Test::More;
 use Moo;
 
 
-extends 'OpenStack::Client::API::Service';
+extends 'OpenStack::Client::Lite::API::Service';
 # roles
 with    'OpenStack::Client::Lite::Roles::Listable';
 

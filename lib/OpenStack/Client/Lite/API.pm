@@ -1,4 +1,4 @@
-package OpenStack::Client::API;
+package OpenStack::Client::Lite::API;
 
 use strict;
 use warnings;

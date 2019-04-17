@@ -1,4 +1,4 @@
-package OpenStack::Client::API::Compute;
+package OpenStack::Client::Lite::API::Compute;
 
 use strict;
 use warnings;
@@ -9,10 +9,10 @@ use Moo;
 # FIXME import LoadData / DataAsYaml
 #use OpenStack::Client::Lite::Helpers::DataAsYaml;
 
-# use Client::API role
-#with 'OpenStack::Client::API'; ...
+# use Client::Lite::API role
+#with 'OpenStack::Client::Lite::API'; ...
 
-extends 'OpenStack::Client::API::Service';
+extends 'OpenStack::Client::Lite::API::Service';
 # roles
 #with    'OpenStack::Client::Lite::Roles::DataAsYaml';
 with    'OpenStack::Client::Lite::Roles::Listable';

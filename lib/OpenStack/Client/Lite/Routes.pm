@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Moo;
 
-use OpenStack::Client::API ();
+use OpenStack::Client::Lite::API ();
 use YAML::XS;
 
 use OpenStack::Client::Lite::Helpers::DataAsYaml;
@@ -66,7 +66,7 @@ sub service {
 	my $k = '_service_' . $name;
 	if ( ! $self->{$k} ) {
 		note "*** get_service.... ", $name;
-		$self->{$k} = OpenStack::Client::API::get_service( 
+		$self->{$k} = OpenStack::Client::Lite::API::get_service( 
 			name => $name, auth => $self->auth, region => $ENV{'OS_REGION_NAME'}
 		);
 	}	

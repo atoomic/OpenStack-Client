@@ -1,4 +1,4 @@
-package OpenStack::Client::API::Network;
+package OpenStack::Client::Lite::API::Network;
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Moo;
 
-extends 'OpenStack::Client::API::Service';
+extends 'OpenStack::Client::Lite::API::Service';
 # roles
 with    'OpenStack::Client::Lite::Roles::Listable';
 
