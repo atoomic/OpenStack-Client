@@ -9,16 +9,34 @@ use Moo::Role;
 sub _list {
 	my ( $self, $all_args, $caller_args ) = @_;
 
+	# all_args are arguments from the internal OpenStack::Client::API
+	# caller_args are coming from the user to filter the results
+	#	if some filters are also arguments to the request
+	#	then appending them to the query will shorten the output and run it faster
+
 	my @all;
 	{
 		my ( $uri, @extra ) = @$all_args;
 		$uri = $self->root_uri( $uri );
+
+		note "*** All args: ", explain $all_args;
+		if ( $uri eq 'v2.0/ports' ) {
+			# apply valid filters to the request itself
+			note "== ~~ "x20;
+			push @extra, { 'device_id', '42147502-68f1-41f8-a764-ada8dae81d65' };
+			#die "====== BOOOM ====";
+		}
+
 		@all = $self->client->all( $uri, @extra );	
 	}
 	
+	note "** ALL: ", explain \@all;
+	note "version: ", $self->version;
+	note "version_prefix: ", $self->version_prefix;
+
 	my @args = @$caller_args;
 
-	# apply our filters
+	# apply our filters to the raw results
 	my $nargs = scalar @args;
 	if ( $nargs && $nargs  % 2 == 0 ) {
 		my %opts = @args;

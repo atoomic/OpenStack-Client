@@ -96,6 +96,12 @@ networks:
   service: network
 add_floating_ip_to_server:
   service: network
+floatingips:
+  service: network
+ports:
+  service: network
+port_from_uid:  
+  service: network
 security_groups:
   service: network
 create_floating_ip:

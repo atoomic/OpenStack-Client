@@ -43,6 +43,20 @@ SKIP: {
     );
 
     {
+        
+        #my $floatingip = $api->floatingips( floating_ip_address => '10.1.35.246' );
+        #note "Floating IPs", explain $floatingip;         
+
+        note "Port for a device... ", 
+            explain [ $api->ports( device_id => '42147502-68f1-41f8-a764-ada8dae81d65' ) ]; 
+        #my $port = $api->port_from_uid( $floatingip->{port_id} );
+        #note explain $port;
+
+    }
+
+    exit;
+
+    {
         note "Security groups";
 
         my @groups = $api->security_groups();
@@ -226,11 +240,16 @@ sub delete_test_servers {
 __END__
 
 TODO 
+- check answer from add_floating_ip_to_server
+- use GetFromId role in more locations
+- add the ip to the answer from create_vm
 - tidy
 - cleanup
 - remove some note
 - split the unit test
 - divide the module
+- move all modules to OpenStack::Client::API::Lite
+- submit PR to OpenStack::Client
 ... 
 
 http://service01a-c2.cpanel.net:8774/v2.1/os-keypairs

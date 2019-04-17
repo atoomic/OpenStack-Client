@@ -9,9 +9,11 @@ use Moo;
 extends 'OpenStack::Client::API::Service';
 # roles
 with    'OpenStack::Client::Lite::Roles::Listable';
+with    'OpenStack::Client::Lite::Roles::GetFromId';
 
 has '+name' => ( default => 'network' );
 has '+version_prefix' => ( default => 'v2.0' );
+has '+version'        => ( default => 'v2' ); # use the v2 specs
 
 sub networks {
 	my ( $self, @args ) = @_;
@@ -25,6 +27,25 @@ sub security_groups {
 	return $self->_list( ['/security-groups', 'security_groups'], \@args );	
 }
 
+
+sub floatingips {
+	my ( $self, @args ) = @_;
+
+	return $self->_list( ['/floatingips', 'floatingips'], \@args );		
+}
+
+sub port_from_uid {
+	my ( $self, $uid ) = @_;
+
+	return $self->_get_from_id( '/ports', $uid );
+}
+
+# https://developer.openstack.org/api-ref/network/v2/index.html?expanded=list-ports-detail#ports
+sub ports {
+	my ( $self, @args ) = @_;
+
+	return $self->_list( ['/ports', 'ports'], \@args );				
+}
 
 # REQ: curl -g -i -X POST http://service01a-c2.cpanel.net:9696/v2.0/floatingips 
 # -H "Content-Type: application/json" -H "User-Agent: openstacksdk/0.27.0 keystoneauth1/3.13.1 python-requests/2.21.0 CPython/3.6.6" -H "X-Auth-Token: {SHA256}b0ba0e5595347e63c0b6f56e7f035977abe209f6fa034f41f7dfe491e6e984a1" -d '{"floatingip": {"floating_network_id": "8a10163f-072c-483a-9834-78395cf8a2e7"}}'
@@ -61,9 +82,14 @@ sub add_floating_ip_to_server {
 	note "using port: ", $port_id;
 	# now link the floating ip to the port
 
-	return $self->put( $self->root_uri( '/floatingips/' . $floatingip_id ), {
+	my $answer = $self->put( $self->root_uri( '/floatingips/' . $floatingip_id ), {
 		floatingip => { port_id => $port_id }
 		} );
+
+	use Test::More;
+	note explain $answer;
+
+	return $answer; ## need to check the answer
 }
 
 1;

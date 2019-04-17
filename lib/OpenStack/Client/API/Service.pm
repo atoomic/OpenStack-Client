@@ -29,7 +29,7 @@ has 'client' => ( is => 'ro', lazy => 1, default => sub {
 #	idea always strip the version from endpoint so we can add it to the uri later..
 #	this would make uri consistent... and improve root_uri
 has 'version' => ( 'is' => 'ro', lazy => 1, default => \&BUILD_version );
-has 'version_prefix' => ( 'is' => 'ro' ); # optiona;
+has 'version_prefix' => ( 'is' => 'ro' ); # added to very routes [optional]
 
 sub BUILD_version {
 	my ( $self ) = @_;
@@ -54,7 +54,10 @@ sub root_uri {
 
 	# append our prefix to the endpoint
 	if ( $self->version_prefix ) {
-		return $self->version_prefix . '/' . $uri;
+		my $base = $self->version_prefix;
+		$base .= '/' unless $uri =~ m{^/};
+		$base .= $uri;
+		return $base;
 	}
 
 	return $uri;
