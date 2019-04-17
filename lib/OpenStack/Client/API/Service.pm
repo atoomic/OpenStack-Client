@@ -25,11 +25,13 @@ has 'client' => ( is => 'ro', lazy => 1, default => sub {
 
 );
 
+has 'api_specs' => ( is => 'ro', lazy => 1, default => \&BUILD_api_specs );
+
 ## FIXME: this needs a refactor...
 #	idea always strip the version from endpoint so we can add it to the uri later..
 #	this would make uri consistent... and improve root_uri
 has 'version' => ( 'is' => 'ro', lazy => 1, default => \&BUILD_version );
-has 'version_prefix' => ( 'is' => 'ro' ); # optiona;
+has 'version_prefix' => ( 'is' => 'ro' ); # added to very routes [optional]
 
 sub BUILD_version {
 	my ( $self ) = @_;
@@ -40,6 +42,23 @@ sub BUILD_version {
 		return $1;
 	}
 	return 'default';
+}
+
+sub BUILD_api_specs { # load specs
+	my ( $self ) = @_;
+
+	my $pkg = 'OpenStack::Client::Lite::API::Specs::' # .
+		. ucfirst( $self->name )  # .
+		. '::' . $self->version;
+
+	my $load = eval qq{ require $pkg; 1 };
+	if ( $load ) {
+		return $pkg->new();
+	}
+
+	# default void specs [ undefined ]
+	#	we do not have to define all specs for now
+	return OpenStack::Client::Lite::API::Specs::Default->new();
 }
 
 sub root_uri {
@@ -54,7 +73,10 @@ sub root_uri {
 
 	# append our prefix to the endpoint
 	if ( $self->version_prefix ) {
-		return $self->version_prefix . '/' . $uri;
+		my $base = $self->version_prefix;
+		$base .= '/' unless $uri =~ m{^/};
+		$base .= $uri;
+		return $base;
 	}
 
 	return $uri;
